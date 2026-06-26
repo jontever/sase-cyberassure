@@ -429,13 +429,31 @@
   };
 
   // ----- dots & pulses -----
-  function makeDot(r,color){
+  function makeDot(r,color,glow){
     const c=document.createElementNS(svgNS,"circle");
     c.setAttribute("r",r);c.setAttribute("fill",color);
-    c.style.filter="drop-shadow(0 0 7px "+color+")";c.style.opacity=0;
+    c.style.filter="drop-shadow(0 0 "+(glow||7)+"px "+color+")";c.style.opacity=0;
     dotLayer.appendChild(c);return c;
   }
-  const dotA=makeDot(4,"#fff"),dotB=makeDot(3.3,"#fff");
+  // comet: a lead dot followed by a fading, shrinking trail
+  const TRAIL=8, TRAIL_GAP=11;
+  const trail=[], trailFade=[];
+  for(let i=0;i<TRAIL;i++){
+    const f=i/(TRAIL-1);                  // 0 = head, 1 = tail
+    const r=4.4-3.0*f;                    // 4.4px head -> 1.4px tail
+    trail.push(makeDot(r,"#fff", r*1.7)); // glow scales with size
+    trailFade.push(+(1-0.92*f).toFixed(3)); // opacity 1 -> ~0.08
+  }
+  function trailColor(c){trail.forEach(d=>d.setAttribute("fill",c));}
+  function trailHide(){trail.forEach(d=>d.style.opacity=0);}
+  function renderTrail(){
+    for(let i=0;i<TRAIL;i++){
+      const d=dist-i*TRAIL_GAP;
+      if(d<0){trail[i].style.opacity=0;continue;}  // tail fades in once there's room
+      place2(trail[i],d);
+      trail[i].style.opacity=trailFade[i];
+    }
+  }
   function place(dot,Pn,t){const pt=Pn.el.getPointAtLength(Math.max(0,Math.min(1,t))*Pn.len);dot.setAttribute("cx",pt.x);dot.setAttribute("cy",pt.y);}
   function pulse(cx,cy,color){
     if(reduced)return;
@@ -500,7 +518,7 @@
   let last=performance.now();
   const statusEl=document.getElementById("status");
 
-  const SPEED=200, GAP=26, LOOP_PAUSE=0.5;   // px/s, trailing-dot offset, end pause
+  const SPEED=200, LOOP_PAUSE=0.5;   // px/s, end-of-route pause
   let wp=[],cum=[],total=0,dist=0,nextIdx=0,pausing=0;
 
   function rightEdge(id){
@@ -553,9 +571,7 @@
     const L=LENS[lens];
     dist=0;nextIdx=0;pausing=0;
     clearLights();document.getElementById("lateralBlocks").setAttribute("opacity",0);
-    dotA.setAttribute("fill",L.chip);dotB.setAttribute("fill",L.chip);
-    dotA.style.opacity=1;dotB.style.opacity=1;
-    place2(dotA,0);place2(dotB,0);
+    trailColor(L.chip);renderTrail();
   }
 
   function setLens(l){
@@ -585,10 +601,10 @@
       }
       nextIdx++;
     }
-    place2(dotA,dist);
-    place2(dotB,Math.max(0,dist-GAP));   // trailing comet, always visible
-    if(dist>=total){
-      dotA.style.opacity=0;dotB.style.opacity=0;   // brief blank at the loop seam only
+    place2(trail[0],dist);   // keep head exact; renderTrail handles the rest
+    renderTrail();
+    if(dist>=total+(TRAIL-1)*TRAIL_GAP){   // wait for the full trail to arrive
+      trailHide();
       pausing=LOOP_PAUSE;
     }
   }
