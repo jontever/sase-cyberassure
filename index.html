@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SASE — ZTNA, Defence in Depth & PAM fulfilment</title>
+<title>SASE — ZTNA, Defence in Depth &amp; PAM fulfilment</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2L29 7.5V18c0 6.5-5.5 11.5-13 13C5.5 29.5 3 24.5 3 18V7.5Z' fill='%230c1424'/%3E%3Cpath d='M16 2L29 7.5V18c0 6.5-5.5 11.5-13 13C5.5 29.5 3 24.5 3 18V7.5Z' fill='none' stroke='%23f6b53c' stroke-width='2'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='sans-serif' font-weight='700' font-size='14' fill='%23f6b53c'%3ES%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,7 +118,6 @@
       radial-gradient(900px 500px at 0% 110%,#c5d5f0 0%,transparent 55%),
       linear-gradient(160deg,var(--bg-1),var(--bg-2));
   }
-  /* controls */
   html[data-theme="light"] .lens{background:#f0f5ff}
   html[data-theme="light"] .lens.on{background:#e8f0ff}
   html[data-theme="light"] .ctl{background:#f0f5ff}
@@ -176,7 +175,7 @@
       <span class="bar"></span>
       <span class="lk">Lens 02</span>
       <div class="lt">Defence in Depth</div>
-      <div class="ld">Independent overlapping layers — identity through to telemetry</div>
+      <div class="ld">Overlapping inspection planes — network · web · cloud · data · threat</div>
     </button>
     <button class="lens" data-lens="pam" role="tab">
       <span class="bar"></span>
@@ -201,7 +200,8 @@
   </div>
 
   <div class="stage">
-    <svg id="diagram" viewBox="0 0 1200 660" role="img" aria-label="SASE controls map">
+    <!-- viewBox 1200×760 to accommodate the vertical inspection-plane stack -->
+    <svg id="diagram" viewBox="0 0 1200 760" role="img" aria-label="SASE controls map">
       <defs>
         <linearGradient id="popGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#1a2c4f"/><stop offset="1" stop-color="#121f39"/>
@@ -209,31 +209,38 @@
         <linearGradient id="popGradLight" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#e8f0ff"/><stop offset="1" stop-color="#dce8ff"/>
         </linearGradient>
+        <!-- Subtle gradient for inspection-plane bands -->
+        <linearGradient id="osiGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#1a2f50"/><stop offset="1" stop-color="#13243f"/>
+        </linearGradient>
       </defs>
 
       <text class="zlabel" x="150" y="34" fill="#5d6f93" text-anchor="middle">Access edge</text>
       <text class="zlabel" x="610" y="34" fill="#7bd0e0" text-anchor="middle">SASE cloud PoP</text>
       <text class="zlabel" x="1050" y="34" fill="#5d6f93" text-anchor="middle">Destinations</text>
-      <line x1="292" y1="48" x2="292" y2="640" stroke="#1c2942" stroke-dasharray="2 6"/>
-      <line x1="930" y1="48" x2="930" y2="640" stroke="#1c2942" stroke-dasharray="2 6"/>
+      <line x1="292" y1="48" x2="292" y2="740" stroke="#1c2942" stroke-dasharray="2 6"/>
+      <line x1="930" y1="48" x2="930" y2="740" stroke="#1c2942" stroke-dasharray="2 6"/>
 
-      <!-- paths -->
+      <!-- paths (ingress/egress anchor at y=360 — vertical mid-point of taller PoP) -->
       <g id="paths" fill="none">
-        <path id="p-std-in"  d="M 240,118 C 320,118 300,300 350,300"/>
-        <path id="p-priv-in" d="M 240,206 C 320,206 320,300 350,300"/>
-        <path id="p-out-net" d="M 872,300 C 928,300 936,128 960,128"/>
-        <path id="p-out-saas" d="M 872,300 C 928,300 928,210 960,210"/>
-        <path id="p-out-app" d="M 872,300 C 928,300 930,310 960,310"/>
-        <path id="p-out-infra" d="M 872,300 C 928,300 905,452 960,452"/>
+        <path id="p-std-in"  d="M 240,118 C 320,118 300,360 350,360"/>
+        <path id="p-priv-in" d="M 240,206 C 320,206 320,360 350,360"/>
+        <path id="p-branch-in" d="M 240,338 C 312,338 318,360 350,360"/>
+        <path id="p-out-net"  d="M 872,360 C 928,360 936,128 960,128"/>
+        <path id="p-out-saas" d="M 872,360 C 928,360 928,210 960,210"/>
+        <path id="p-out-app"  d="M 872,360 C 928,360 930,340 960,340"/>
+        <path id="p-out-infra" d="M 872,360 C 928,360 905,530 960,530"/>
       </g>
       <g fill="none" stroke="#23344f" stroke-width="2" opacity=".45">
         <use href="#p-std-in"/><use href="#p-priv-in"/>
         <use href="#p-out-net"/><use href="#p-out-saas"/><use href="#p-out-app"/><use href="#p-out-infra"/>
       </g>
+      <!-- branch / SD-WAN site tunnel — dashed to denote an always-on IPsec/SD-WAN overlay into the PoP -->
+      <use href="#p-branch-in" fill="none" stroke="#2a3a5c" stroke-width="2" stroke-dasharray="5 4" opacity=".7"/>
       <!-- blocked lateral arrows (ZTNA) -->
       <g id="lateralBlocks" opacity="0">
-        <path d="M 960,310 C 940,360 945,400 960,440" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="4 5"/>
-        <g transform="translate(948,375)"><line x1="-6" y1="-6" x2="6" y2="6" stroke="#ff6b6b" stroke-width="2.5"/><line x1="6" y1="-6" x2="-6" y2="6" stroke="#ff6b6b" stroke-width="2.5"/></g>
+        <path d="M 960,340 C 940,400 945,460 960,510" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="4 5"/>
+        <g transform="translate(948,428)"><line x1="-6" y1="-6" x2="6" y2="6" stroke="#ff6b6b" stroke-width="2.5"/><line x1="6" y1="-6" x2="-6" y2="6" stroke="#ff6b6b" stroke-width="2.5"/></g>
       </g>
 
       <!-- ===== Access nodes ===== -->
@@ -248,15 +255,15 @@
         <text class="n-sub" x="78" y="222" fill="#93a6c9">administrator</text>
       </g>
       <g class="comp" data-comp="branch">
-        <rect x="60" y="266" width="180" height="56" rx="10" fill="#16233f" stroke="#2a3a5c"/>
-        <text class="n-title" x="78" y="292" fill="#eaf0fb">Branch / SD-WAN</text>
-        <text class="n-sub" x="78" y="310" fill="#93a6c9">site tunnel</text>
+        <rect x="60" y="310" width="180" height="56" rx="10" fill="#16233f" stroke="#2a3a5c"/>
+        <text class="n-title" x="78" y="336" fill="#eaf0fb">Branch / SD-WAN</text>
+        <text class="n-sub" x="78" y="354" fill="#93a6c9">site tunnel</text>
       </g>
 
-      <!-- ===== PoP ===== -->
-      <rect id="popRect" x="350" y="64" width="522" height="540" rx="18" fill="url(#popGrad)" stroke="#33507f" stroke-opacity=".7"/>
-      <circle id="ingress" cx="350" cy="300" r="5" fill="#28d8ef" opacity="0"/>
-      <circle id="egress" cx="872" cy="300" r="5" fill="#28d8ef" opacity="0"/>
+      <!-- ===== PoP — height fits the vertical inspection-plane stack ===== -->
+      <rect id="popRect" x="350" y="64" width="522" height="648" rx="18" fill="url(#popGrad)" stroke="#33507f" stroke-opacity=".7"/>
+      <circle id="ingress" cx="350" cy="360" r="5" fill="#28d8ef" opacity="0"/>
+      <circle id="egress"  cx="872" cy="360" r="5" fill="#28d8ef" opacity="0"/>
 
       <!-- IdP / identity -->
       <g class="comp" data-comp="idp">
@@ -264,82 +271,122 @@
         <text class="n-title" x="384" y="104" fill="#ffd587">Identity provider · MFA · device posture</text>
         <text class="n-sub" x="384" y="120" fill="#caa86a">SAML / OIDC · step-up authentication · compliance signals</text>
       </g>
-      <!-- ZTNA broker -->
-      <g class="comp" data-comp="ztna">
-        <rect x="368" y="142" width="486" height="46" rx="10" fill="#1b2748" stroke="#3a4d75"/>
-        <text class="n-title" x="384" y="162" fill="#eaf0fb">ZTNA broker — per-app, least privilege</text>
-        <text class="n-sub" x="384" y="178" fill="#93a6c9">outbound app connectors · no inbound exposure · no lateral movement</text>
-      </g>
 
-      <!-- DiD inspection stack -->
-      <g>
-        <rect x="368" y="200" width="486" height="150" rx="12" fill="rgba(167,139,250,.08)" stroke="#3b3567" stroke-opacity=".55"/>
-        <text class="zlabel" x="384" y="221" fill="#b9a7f6" font-size="10" style="letter-spacing:.02em">Defence in depth — layered inspection (single pass)</text>
-        <g class="comp" data-comp="fwaas">
-          <rect x="382" y="232" width="150" height="44" rx="8" fill="#15223f" stroke="#3a4d75"/>
-          <text class="n-sub" x="396" y="250" fill="#7bf0de" font-weight="600">L3 · FWaaS</text>
-          <text class="n-sub" x="396" y="265" fill="#93a6c9" font-size="9">L3–L7 firewall · IPS</text>
-        </g>
-        <g class="comp" data-comp="swg">
-          <rect x="540" y="232" width="150" height="44" rx="8" fill="#15223f" stroke="#3a4d75"/>
-          <text class="n-sub" x="554" y="250" fill="#7bf0de" font-weight="600">L4 · SWG</text>
-          <text class="n-sub" x="554" y="265" fill="#93a6c9" font-size="9">TLS inspect · RBI</text>
-        </g>
-        <g class="comp" data-comp="casb">
-          <rect x="698" y="232" width="142" height="44" rx="8" fill="#15223f" stroke="#3a4d75"/>
-          <text class="n-sub" x="712" y="250" fill="#7bf0de" font-weight="600">L5 · CASB</text>
-          <text class="n-sub" x="712" y="265" fill="#93a6c9" font-size="9">SaaS · shadow IT</text>
-        </g>
-        <g class="comp" data-comp="dlp">
-          <rect x="382" y="288" width="248" height="46" rx="8" fill="#15223f" stroke="#3a4d75"/>
-          <text class="n-sub" x="396" y="307" fill="#7bf0de" font-weight="600">L6 · DLP</text>
-          <text class="n-sub" x="396" y="322" fill="#93a6c9" font-size="9">content inspection · egress control</text>
-        </g>
-        <g class="comp" data-comp="threat">
-          <rect x="638" y="288" width="202" height="46" rx="8" fill="#15223f" stroke="#3a4d75"/>
-          <text class="n-sub" x="652" y="307" fill="#7bf0de" font-weight="600">L7 · Threat prevention</text>
-          <text class="n-sub" x="652" y="322" fill="#93a6c9" font-size="9">sandbox · threat intel · AV</text>
-        </g>
-      </g>
-
-      <!-- Policy engine -->
+      <!-- Policy engine (PDP/PEP) — evaluated before the broker grants access -->
       <g class="comp" data-comp="policy">
-        <rect x="368" y="362" width="486" height="46" rx="10" fill="#15233f" stroke="#3a4d75"/>
-        <circle cx="392" cy="385" r="6" fill="#1b2748" stroke="#f6b53c"/>
-        <text class="n-title" x="410" y="381" fill="#eaf0fb" font-size="12.5">Policy engine — PDP / PEP</text>
-        <text class="n-sub" x="410" y="397" fill="#93a6c9" font-size="9.5">identity · device · context · risk → least-privilege entitlement</text>
+        <rect x="368" y="142" width="486" height="46" rx="10" fill="#15233f" stroke="#3a4d75"/>
+        <circle cx="392" cy="165" r="6" fill="#1b2748" stroke="#f6b53c"/>
+        <text class="n-title" x="410" y="161" fill="#eaf0fb" font-size="12.5">Policy engine — PDP / PEP</text>
+        <text class="n-sub" x="410" y="177" fill="#93a6c9" font-size="9.5">identity · device · context · risk → least-privilege entitlement</text>
       </g>
-      <!-- continuous authorisation -->
+
+      <!-- ===== Defence in Depth — overlapping inspection planes (single decrypt-once pass) ===== -->
+      <g>
+        <!-- Section container -->
+        <rect x="368" y="202" width="486" height="282" rx="12" fill="rgba(167,139,250,.07)" stroke="#3b3567" stroke-opacity=".55"/>
+        <text class="zlabel" x="384" y="222" fill="#b9a7f6" font-size="10" style="letter-spacing:.02em">Defence in depth — overlapping inspection planes (single pass)</text>
+
+        <!-- column headers -->
+        <text x="394" y="240" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#3d5075" letter-spacing=".12em">PLANE</text>
+        <line x1="562" y1="228" x2="562" y2="478" stroke="#1e3055" stroke-width="1" stroke-dasharray="2 4"/>
+        <text x="572" y="240" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#3d5075" letter-spacing=".12em">SASE CONTROL</text>
+
+        <!-- Network plane → FWaaS -->
+        <g class="comp" data-comp="fwaas">
+          <rect x="382" y="246" width="458" height="42" rx="7" fill="url(#osiGrad)" stroke="#3a4d75"/>
+          <rect x="382" y="246" width="5" height="42" rx="3" fill="#28d8ef" opacity="0.6"/>
+          <rect x="392" y="253" width="44" height="28" rx="5" fill="rgba(40,216,239,0.12)" stroke="#28d8ef" stroke-opacity=".3" stroke-width=".75"/>
+          <text x="414" y="271" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600" fill="#28d8ef">NET</text>
+          <text x="446" y="271" font-family="'Inter',system-ui,sans-serif" font-size="9.5" fill="#93a6c9">Network</text>
+          <line x1="562" y1="250" x2="562" y2="284" stroke="#1e3055" stroke-width="1"/>
+          <text x="572" y="263" font-family="'Inter',system-ui,sans-serif" font-size="11" font-weight="600" fill="#7bf0de">FWaaS</text>
+          <text x="572" y="278" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#5d6f93">L3–L7 firewall · IPS · geo/IP filtering</text>
+        </g>
+
+        <!-- Web plane → SWG -->
+        <g class="comp" data-comp="swg">
+          <rect x="382" y="292" width="458" height="42" rx="7" fill="url(#osiGrad)" stroke="#3a4d75"/>
+          <rect x="382" y="292" width="5" height="42" rx="3" fill="#28d8ef" opacity="0.52"/>
+          <rect x="392" y="299" width="44" height="28" rx="5" fill="rgba(40,216,239,0.1)" stroke="#28d8ef" stroke-opacity=".26" stroke-width=".75"/>
+          <text x="414" y="317" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600" fill="#28d8ef">WEB</text>
+          <text x="446" y="317" font-family="'Inter',system-ui,sans-serif" font-size="9.5" fill="#93a6c9">Web</text>
+          <line x1="562" y1="296" x2="562" y2="330" stroke="#1e3055" stroke-width="1"/>
+          <text x="572" y="309" font-family="'Inter',system-ui,sans-serif" font-size="11" font-weight="600" fill="#7bf0de">SWG</text>
+          <text x="572" y="324" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#5d6f93">TLS termination · inspection · RBI · URL filter</text>
+        </g>
+
+        <!-- Cloud-app plane → CASB -->
+        <g class="comp" data-comp="casb">
+          <rect x="382" y="338" width="458" height="42" rx="7" fill="url(#osiGrad)" stroke="#3a4d75"/>
+          <rect x="382" y="338" width="5" height="42" rx="3" fill="#28d8ef" opacity="0.44"/>
+          <rect x="392" y="345" width="44" height="28" rx="5" fill="rgba(40,216,239,0.08)" stroke="#28d8ef" stroke-opacity=".22" stroke-width=".75"/>
+          <text x="414" y="363" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600" fill="#28d8ef">APP</text>
+          <text x="446" y="363" font-family="'Inter',system-ui,sans-serif" font-size="9.5" fill="#93a6c9">Cloud app</text>
+          <line x1="562" y1="342" x2="562" y2="376" stroke="#1e3055" stroke-width="1"/>
+          <text x="572" y="355" font-family="'Inter',system-ui,sans-serif" font-size="11" font-weight="600" fill="#7bf0de">CASB</text>
+          <text x="572" y="370" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#5d6f93">SaaS visibility · shadow IT · cloud-app control</text>
+        </g>
+
+        <!-- Data plane → DLP -->
+        <g class="comp" data-comp="dlp">
+          <rect x="382" y="384" width="458" height="42" rx="7" fill="url(#osiGrad)" stroke="#3a4d75"/>
+          <rect x="382" y="384" width="5" height="42" rx="3" fill="#28d8ef" opacity="0.36"/>
+          <rect x="392" y="391" width="44" height="28" rx="5" fill="rgba(40,216,239,0.06)" stroke="#28d8ef" stroke-opacity=".18" stroke-width=".75"/>
+          <text x="414" y="409" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600" fill="#28d8ef">DATA</text>
+          <text x="446" y="409" font-family="'Inter',system-ui,sans-serif" font-size="9.5" fill="#93a6c9">Content</text>
+          <line x1="562" y1="388" x2="562" y2="422" stroke="#1e3055" stroke-width="1"/>
+          <text x="572" y="401" font-family="'Inter',system-ui,sans-serif" font-size="11" font-weight="600" fill="#7bf0de">DLP</text>
+          <text x="572" y="416" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#5d6f93">content inspection · egress control · data tagging</text>
+        </g>
+
+        <!-- Threat plane → Threat Prevention -->
+        <g class="comp" data-comp="threat">
+          <rect x="382" y="430" width="458" height="42" rx="7" fill="url(#osiGrad)" stroke="#3a4d75"/>
+          <rect x="382" y="430" width="5" height="42" rx="3" fill="#28d8ef" opacity="0.28"/>
+          <rect x="392" y="437" width="44" height="28" rx="5" fill="rgba(40,216,239,0.05)" stroke="#28d8ef" stroke-opacity=".14" stroke-width=".75"/>
+          <text x="414" y="455" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600" fill="#28d8ef">THR</text>
+          <text x="446" y="455" font-family="'Inter',system-ui,sans-serif" font-size="9.5" fill="#93a6c9">Threat</text>
+          <line x1="562" y1="434" x2="562" y2="468" stroke="#1e3055" stroke-width="1"/>
+          <text x="572" y="447" font-family="'Inter',system-ui,sans-serif" font-size="11" font-weight="600" fill="#7bf0de">Threat Prevention</text>
+          <text x="572" y="462" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#5d6f93">sandbox · threat intel · AV · malware</text>
+        </g>
+      </g>
+
+      <!-- ZTNA broker — sits after policy decision; brokers the per-app grant -->
+      <g class="comp" data-comp="ztna">
+        <rect x="368" y="498" width="486" height="46" rx="10" fill="#1b2748" stroke="#3a4d75"/>
+        <text class="n-title" x="384" y="518" fill="#eaf0fb">ZTNA broker — per-app, least privilege</text>
+        <text class="n-sub" x="384" y="534" fill="#93a6c9">outbound app connectors · no inbound exposure · no lateral movement</text>
+      </g>
+
+      <!-- Continuous authorisation -->
       <g class="comp" data-comp="contauth">
-        <rect x="368" y="420" width="486" height="40" rx="10" fill="#13203a" stroke="#2a3a5c"/>
-        <text class="n-sub" x="384" y="438" fill="#ffd587" font-weight="600">Continuous authorisation &amp; telemetry</text>
-        <text class="n-sub" x="384" y="452" fill="#93a6c9" font-size="9.5">session re-evaluated on risk / posture change · full logging</text>
+        <rect x="368" y="556" width="486" height="40" rx="10" fill="#13203a" stroke="#2a3a5c"/>
+        <text class="n-sub" x="384" y="574" fill="#ffd587" font-weight="600">Continuous authorisation &amp; telemetry</text>
+        <text class="n-sub" x="384" y="588" fill="#93a6c9" font-size="9.5">session re-evaluated on risk / posture change · full logging</text>
       </g>
 
       <!-- PAM service -->
       <g>
-        <rect x="368" y="472" width="486" height="118" rx="12" fill="rgba(200,121,240,.08)" stroke="#5a3a78" stroke-opacity=".6"/>
-        <text class="zlabel" x="384" y="492" fill="#e6b6ff" font-size="10" style="letter-spacing:.02em">Privileged Access Management — engaged for privileged sessions</text>
+        <rect x="368" y="608" width="486" height="92" rx="12" fill="rgba(200,121,240,.08)" stroke="#5a3a78" stroke-opacity=".6"/>
+        <text class="zlabel" x="384" y="626" fill="#e6b6ff" font-size="10" style="letter-spacing:.02em">Privileged Access Management — adjacent control, integrated via ZTNA</text>
         <g class="comp" data-comp="pam-vault">
-          <rect x="382" y="502" width="150" height="74" rx="8" fill="#1e1733" stroke="#6b4a8c"/>
-          <text class="n-sub" x="396" y="522" fill="#e6b6ff" font-weight="600">Credential vault</text>
-          <text class="n-sub" x="396" y="538" fill="#b794d0" font-size="9">no standing creds</text>
-          <text class="n-sub" x="396" y="552" fill="#b794d0" font-size="9">injection — endpoint</text>
-          <text class="n-sub" x="396" y="565" fill="#b794d0" font-size="9">never sees secret</text>
+          <rect x="382" y="634" width="146" height="58" rx="8" fill="#1e1733" stroke="#6b4a8c"/>
+          <text class="n-sub" x="396" y="652" fill="#e6b6ff" font-weight="600">Credential vault</text>
+          <text class="n-sub" x="396" y="666" fill="#b794d0" font-size="9">no standing creds</text>
+          <text class="n-sub" x="396" y="679" fill="#b794d0" font-size="9">injection — never seen</text>
         </g>
         <g class="comp" data-comp="pam-jit">
-          <rect x="540" y="502" width="150" height="74" rx="8" fill="#1e1733" stroke="#6b4a8c"/>
-          <text class="n-sub" x="554" y="522" fill="#e6b6ff" font-weight="600">JIT elevation</text>
-          <text class="n-sub" x="554" y="538" fill="#b794d0" font-size="9">time-bound access</text>
-          <text class="n-sub" x="554" y="552" fill="#b794d0" font-size="9">approval workflow</text>
-          <text class="n-sub" x="554" y="565" fill="#b794d0" font-size="9">MFA step-up</text>
+          <rect x="536" y="634" width="146" height="58" rx="8" fill="#1e1733" stroke="#6b4a8c"/>
+          <text class="n-sub" x="550" y="652" fill="#e6b6ff" font-weight="600">JIT elevation</text>
+          <text class="n-sub" x="550" y="666" fill="#b794d0" font-size="9">time-bound access</text>
+          <text class="n-sub" x="550" y="679" fill="#b794d0" font-size="9">approval + MFA step-up</text>
         </g>
         <g class="comp" data-comp="pam-rec">
-          <rect x="698" y="502" width="142" height="74" rx="8" fill="#1e1733" stroke="#6b4a8c"/>
-          <text class="n-sub" x="712" y="522" fill="#e6b6ff" font-weight="600">Session broker</text>
-          <text class="n-sub" x="712" y="538" fill="#b794d0" font-size="9">isolated proxy</text>
-          <text class="n-sub" x="712" y="552" fill="#b794d0" font-size="9">full recording</text>
-          <text class="n-sub" x="712" y="565" fill="#b794d0" font-size="9">immutable audit</text>
+          <rect x="690" y="634" width="150" height="58" rx="8" fill="#1e1733" stroke="#6b4a8c"/>
+          <text class="n-sub" x="704" y="652" fill="#e6b6ff" font-weight="600">Session broker</text>
+          <text class="n-sub" x="704" y="666" fill="#b794d0" font-size="9">isolated proxy</text>
+          <text class="n-sub" x="704" y="679" fill="#b794d0" font-size="9">full recording · audit</text>
         </g>
       </g>
 
@@ -355,14 +402,14 @@
         <text class="n-sub" x="978" y="226" fill="#93a6c9">M365 · Salesforce</text>
       </g>
       <g class="comp" data-comp="dest-app">
-        <rect x="960" y="282" width="180" height="56" rx="10" fill="#16233f" stroke="#2a3a5c"/>
-        <text class="n-title" x="978" y="308" fill="#eaf0fb">Private apps</text>
-        <text class="n-sub" x="978" y="326" fill="#93a6c9">data centre · IaaS</text>
+        <rect x="960" y="312" width="180" height="56" rx="10" fill="#16233f" stroke="#2a3a5c"/>
+        <text class="n-title" x="978" y="338" fill="#eaf0fb">Private apps</text>
+        <text class="n-sub" x="978" y="356" fill="#93a6c9">data centre · IaaS</text>
       </g>
       <g class="comp" data-comp="dest-infra">
-        <rect x="960" y="424" width="180" height="56" rx="10" fill="#16233f" stroke="#2a3a5c"/>
-        <text class="n-title" x="978" y="450" fill="#eaf0fb">Infrastructure</text>
-        <text class="n-sub" x="978" y="468" fill="#93a6c9">servers · databases</text>
+        <rect x="960" y="502" width="180" height="56" rx="10" fill="#16233f" stroke="#2a3a5c"/>
+        <text class="n-title" x="978" y="528" fill="#eaf0fb">Infrastructure</text>
+        <text class="n-sub" x="978" y="546" fill="#93a6c9">servers · databases</text>
       </g>
 
       <g id="dotLayer"></g>
@@ -433,27 +480,27 @@
     did:{
       title:"Defence in Depth",
       chip:"#28d8ef",
-      blurb:"Independent, overlapping layers — a single control failing does not breach the chain. Traffic is inspected once through every layer.",
-      focus:["user-std","idp","policy","fwaas","swg","casb","dlp","threat","contauth","dest-saas"],
+      blurb:"Independent, overlapping inspection planes in a single decrypt-once pass — network, web, cloud-app, data and threat engines each operate independently, so a miss at one plane is still caught at another. Branch/SD-WAN and user traffic converge on the same planes.",
+      focus:["user-std","branch","idp","policy","fwaas","swg","casb","dlp","threat","contauth","dest-saas"],
       reqs:[
-        {need:"Layer 1 — Identity assurance",fix:"IdP authentication and MFA",comp:"idp"},
-        {need:"Layer 2 — Device trust",fix:"Posture & compliance at the policy engine",comp:"policy"},
-        {need:"Layer 3 — Network controls",fix:"FWaaS L3–L7 firewalling and IPS",comp:"fwaas"},
-        {need:"Layer 4 — Web & content",fix:"SWG with TLS inspection and isolation",comp:"swg"},
-        {need:"Layer 5 — Cloud application control",fix:"CASB visibility and shadow-IT control",comp:"casb"},
-        {need:"Layer 6 — Data protection",fix:"DLP content inspection on egress",comp:"dlp"},
-        {need:"Layer 7 — Threat prevention",fix:"Sandboxing, AV and threat intelligence",comp:"threat"},
-        {need:"Layer 8 — Visibility & telemetry",fix:"Continuous logging and authorisation",comp:"contauth"}
+        {need:"Identity assurance (pre-inspection)",fix:"IdP authentication and MFA before traffic enters",comp:"idp"},
+        {need:"Device trust (pre-inspection)",fix:"Posture & compliance at the policy engine",comp:"policy"},
+        {need:"Network plane — IP/port & intrusion controls",fix:"FWaaS L3–L7 firewalling and IPS",comp:"fwaas"},
+        {need:"Web plane — TLS inspection & filtering",fix:"SWG with TLS termination, inspection and RBI",comp:"swg"},
+        {need:"Cloud-app plane — SaaS governance",fix:"CASB visibility, access control, shadow IT",comp:"casb"},
+        {need:"Data plane — content protection on egress",fix:"DLP content inspection and data tagging",comp:"dlp"},
+        {need:"Threat plane — malware & exploit prevention",fix:"Sandboxing, AV and threat intelligence",comp:"threat"},
+        {need:"Continuous visibility & telemetry",fix:"Session re-evaluation and full logging layer",comp:"contauth"}
       ],
       steps:[
-        {comp:"idp",note:"Layer 1 — identity verified"},
-        {comp:"policy",note:"Layer 2 — device posture checked"},
-        {comp:"fwaas",note:"Layer 3 — FWaaS / IPS"},
-        {comp:"swg",note:"Layer 4 — SWG, TLS inspection"},
-        {comp:"casb",note:"Layer 5 — CASB cloud-app control"},
-        {comp:"dlp",note:"Layer 6 — DLP content inspection"},
-        {comp:"threat",note:"Layer 7 — sandbox & threat intel"},
-        {comp:"contauth",note:"Layer 8 — telemetry & continuous logging"},
+        {comp:"idp",note:"Identity verified — before entering the inspection planes"},
+        {comp:"policy",note:"Device posture checked — least-privilege context established"},
+        {comp:"fwaas",note:"Network plane — FWaaS · IP filtering · IPS"},
+        {comp:"swg",note:"Web plane — SWG · TLS termination · RBI"},
+        {comp:"casb",note:"Cloud-app plane — CASB · SaaS visibility"},
+        {comp:"dlp",note:"Data plane — DLP · content inspection"},
+        {comp:"threat",note:"Threat plane — sandbox · threat intel · AV"},
+        {comp:"contauth",note:"Telemetry layer — continuous logging and re-authorisation"},
         {comp:"dest-saas",note:"Clean traffic released to destination"}
       ],
       flow:{in:"stdIn",out:"saas"}
@@ -492,21 +539,20 @@
     c.style.filter="drop-shadow(0 0 "+(glow||7)+"px "+color+")";c.style.opacity=0;
     dotLayer.appendChild(c);return c;
   }
-  // comet: a lead dot followed by a fading, shrinking trail
   const TRAIL=8, TRAIL_GAP=11;
   const trail=[], trailFade=[];
   for(let i=0;i<TRAIL;i++){
-    const f=i/(TRAIL-1);                  // 0 = head, 1 = tail
-    const r=4.4-3.0*f;                    // 4.4px head -> 1.4px tail
-    trail.push(makeDot(r,"#fff", r*1.7)); // glow scales with size
-    trailFade.push(+(1-0.92*f).toFixed(3)); // opacity 1 -> ~0.08
+    const f=i/(TRAIL-1);
+    const r=4.4-3.0*f;
+    trail.push(makeDot(r,"#fff", r*1.7));
+    trailFade.push(+(1-0.92*f).toFixed(3));
   }
   function trailColor(c){trail.forEach(d=>d.setAttribute("fill",c));}
   function trailHide(){trail.forEach(d=>d.style.opacity=0);}
   function renderTrail(){
     for(let i=0;i<TRAIL;i++){
       const d=dist-i*TRAIL_GAP;
-      if(d<0){trail[i].style.opacity=0;continue;}  // tail fades in once there's room
+      if(d<0){trail[i].style.opacity=0;continue;}
       place2(trail[i],d);
       trail[i].style.opacity=trailFade[i];
     }
@@ -575,16 +621,14 @@
   let last=performance.now();
   const statusEl=document.getElementById("status");
 
-  const SPEED=200, LOOP_PAUSE=0.5;   // px/s, end-of-route pause
-  let wp=[],cum=[],total=0,dist=0,nextIdx=0,pausing=0;
+  const SPEED=200;   // px/s — no pause between loops; animation is continuous
+  let wp=[],cum=[],total=0,dist=0,nextIdx=0;
 
   function rightEdge(id){
     const r=rectOf(id);
     return{x:(+r.getAttribute("x"))+(+r.getAttribute("width")),y:(+r.getAttribute("y"))+(+r.getAttribute("height"))/2};
   }
 
-  // Build a single ordered set of waypoints: access edge -> ingress -> each step
-  // component centre -> egress -> destination. The dot travels the whole route.
   function buildRoute(){
     const L=LENS[lens];
     const startNode=L.flow.in==="privIn"?"user-priv":"user-std";
@@ -594,13 +638,13 @@
     L.steps.forEach(s=>{
       if(s.comp===startNode){
         pts[0].comp=s.comp;pts[0].light=true;pts[0].note=s.note;pts[0].lateral=s.lateral;
-        pts.push({x:350,y:300,comp:null,light:false});entered=true;
+        pts.push({x:350,y:360,comp:null,light:false});entered=true;
       }else if(s.comp.indexOf("dest-")===0){
-        if(!exited){pts.push({x:872,y:300,comp:null,light:false});exited=true;}
+        if(!exited){pts.push({x:872,y:360,comp:null,light:false});exited=true;}
         const c=centreOf(s.comp);
         pts.push({x:c.x,y:c.y,comp:s.comp,light:true,note:s.note,lateral:s.lateral});
       }else{
-        if(!entered){pts.push({x:350,y:300,comp:null,light:false});entered=true;}
+        if(!entered){pts.push({x:350,y:360,comp:null,light:false});entered=true;}
         const c=centreOf(s.comp);
         pts.push({x:c.x,y:c.y,comp:s.comp,light:true,note:s.note,lateral:s.lateral});
       }
@@ -626,9 +670,9 @@
 
   function startRoute(){
     const L=LENS[lens];
-    dist=0;nextIdx=0;pausing=0;
+    dist=0;nextIdx=0;
     clearLights();document.getElementById("lateralBlocks").setAttribute("opacity",0);
-    trailColor(L.chip);renderTrail();
+    trailColor(L.chip);
   }
 
   function setLens(l){
@@ -646,7 +690,6 @@
 
   function tick(dt){
     const L=LENS[lens];
-    if(pausing>0){pausing-=dt;if(pausing<=0)startRoute();return;}
     dist+=SPEED*dt;
     // trigger lighting as the lead dot reaches each waypoint
     while(nextIdx<wp.length&&dist>=cum[nextIdx]){
@@ -658,11 +701,16 @@
       }
       nextIdx++;
     }
-    place2(trail[0],dist);   // keep head exact; renderTrail handles the rest
-    renderTrail();
-    if(dist>=total+(TRAIL-1)*TRAIL_GAP){   // wait for the full trail to arrive
-      trailHide();
-      pausing=LOOP_PAUSE;
+    // render trail
+    for(let i=0;i<TRAIL;i++){
+      const d=dist-i*TRAIL_GAP;
+      if(d<0){trail[i].style.opacity=0;continue;}
+      place2(trail[i],d);
+      trail[i].style.opacity=trailFade[i];
+    }
+    // continuous loop — restart immediately when tail clears the end
+    if(dist>=total+(TRAIL-1)*TRAIL_GAP){
+      startRoute();
     }
   }
 
