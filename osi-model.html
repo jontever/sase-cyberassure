@@ -215,7 +215,7 @@
     <div class="meta">
       <span><b>Spine:</b> 7-layer OSI model · enforcement down / telemetry up</span>
       <span><b>Access governance:</b> ZTNA (who reaches what) · PAM (privileged power)</span>
-      <span><b>Loop:</b> Collect → Detect → Respond → Adapt (Splunk-style)</span>
+      <span><b>Loop:</b> Collect → Detect → Respond → Adapt</span>
     </div>
   </header>
 
@@ -236,9 +236,9 @@
     <p class="lead">A user or device is brokered by <b style="color:#5eead4">ZTNA</b> into the
       <b style="color:#7cb0ff">OSI enforcement stack</b>. On egress, traffic descends the
       <b style="color:#7cb0ff">left rail</b> through every layer to the protected resource (<b style="color:#7cb0ff">blue, down</b>).
-      On ingress, the response and aggregated telemetry ascend the <b style="color:#ffb27c">right rail</b> back up the stack
-      (<b style="color:#ffb27c">orange, up</b>) and exit to the <b style="color:#ffb27c">operating model</b>, which feeds
-      adaptive policy back to ZTNA. <b style="color:#c4b5fd">PAM</b> vaults privileged sessions before they enter the stack.
+      Every layer independently streams its <b style="color:#ffb27c">telemetry</b> up into the
+      <b style="color:#ffb27c">SIEM</b> (<b style="color:#ffb27c">orange, up</b>) — a data-to-everything feed that the
+      <b style="color:#ffb27c">operating model</b> correlates, responds to, and turns into adaptive policy back to ZTNA. <b style="color:#c4b5fd">PAM</b> vaults privileged sessions before they enter the stack.
       Click any node to isolate its flows; use the chips to trace one pillar end-to-end.
       The OSI layering is a teaching lens — in practice SSE applies these controls in a single pass at the PoP (see the Single-pass SSE tab).</p>
 
@@ -271,7 +271,7 @@
         <text class="grouplabel" x="880" y="34">Resource</text>
         <text class="grouplabel" x="1000" y="34">Operating model</text>
         <text class="axislabel" x="510" y="360" fill="#60a5fa" text-anchor="middle" transform="rotate(-90 510 360)">enforcement &#8595; down</text>
-        <text class="axislabel" x="812" y="210" fill="#fb923c" text-anchor="middle" transform="rotate(-90 812 210)">telemetry &#8593; up</text>
+        <text class="axislabel" x="838" y="150" fill="#fb923c">telemetry &#8594; SIEM</text>
         <g id="links"></g>
         <g id="particles"></g>
         <g id="nodes"></g>
@@ -435,7 +435,7 @@
   </section>
 
   <div class="foot">
-    SASE defence-in-depth operating model · OSI layers L7–L1 · ZTNA &amp; PAM access governance · Splunk-style collect-detect-respond-adapt loop · Interactive reference.
+    SASE defence-in-depth operating model · OSI layers L7–L1 · ZTNA &amp; PAM access governance · Interactive reference.
   </div>
 </div>
 
@@ -498,8 +498,14 @@ const LINKS=[
   ['l7','l1',['sse','net','ztna'],'railDown'],
   ['l1','res',['net'],'flat'],
   ['res','l1',['net','secops'],'flatup'],
-  ['l1','l7',['sse','net','ztna','secops'],'railUp'],
-  ['l7','siem',['secops'],'flatup'],
+  /* telemetry taps: every OSI layer streams up into the SIEM */
+  ['l7','siem',['secops','sse'],'feed'],
+  ['l6','siem',['secops','sse'],'feed'],
+  ['l5','siem',['secops','ztna'],'feed'],
+  ['l4','siem',['secops','net'],'feed'],
+  ['l3','siem',['secops','net'],'feed'],
+  ['l2','siem',['secops','net'],'feed'],
+  ['l1','siem',['secops','net'],'feed'],
   ['adm','pam',['pam'],'flat'],['pam','l5',['pam'],'flat'],
   ['siem','soar',['secops'],'opsv'],['soar','pol',['secops'],'opsv'],['pol','ztna',['secops','ztna'],'loop'],
 ];
@@ -507,6 +513,8 @@ const LINKS=[
 /* ---------------- BUILD SVG ---------------- */
 const NS='http://www.w3.org/2000/svg';
 const W={src:160,ztna:180,osi:210,res:170,pam:160,ops:170}, H=54;
+/* staggered entry points on the SIEM's left edge so the 7 layer feeds fan in */
+const FEEDY={l7:276,l6:282,l5:288,l4:294,l3:300,l2:306,l1:312};
 const nodeById={};NODES.forEach(n=>nodeById[n.id]=n);
 const gLinks=document.getElementById('links'),gNodes=document.getElementById('nodes'),gPart=document.getElementById('particles');
 function cx(n){return n.x+W[n.type]/2;}
@@ -524,6 +532,10 @@ function pathFor(a,b,kind){
     const x=780,ax=a.x+W[a.type],bx=b.x+W[b.type],ay=cy(a),by=cy(b);
     return `M${ax},${ay} L${x},${ay} L${x},${by} L${bx},${by}`;
   }
+  if(kind==='feed'){ /* telemetry tap: layer right edge -> SIEM left edge, fanning in above the resource */
+    const ax=a.x+W[a.type],ay=cy(a),ex=b.x,ey=FEEDY[a.id]||cy(b);
+    return `M${ax},${ay} C${ax+55},${ey} ${ex-120},${ey} ${ex},${ey}`;
+  }
   if(kind==='opsv'){ /* vertical chain in the operating-model column */
     const x=cx(a);let y1,y2;
     if(b.y>a.y){y1=a.y+H;y2=b.y;}else{y1=a.y;y2=b.y+H;}
@@ -539,7 +551,7 @@ function pathFor(a,b,kind){
 }
 function linkColor(a,b,kind){
   if(a.type==='pam'||b.type==='pam')return'pam';
-  if(kind==='up'||kind==='flatup'||kind==='opsv'||kind==='loop'||kind==='railUp')return'up';
+  if(kind==='up'||kind==='flatup'||kind==='opsv'||kind==='loop'||kind==='railUp'||kind==='feed')return'up';
   return'down';
 }
 const CATCOL={down:'#60a5fa',up:'#fb923c',pam:'#c4b5fd'};
